@@ -1,4 +1,4 @@
-# Project Template
+# Research Template
 
 This template enables an easy installation, configuration management system and dataset reproduction system. \
 The system revolves around modularizing the system into its components, as described in the following.
