@@ -20,9 +20,9 @@ mkdir -p "src/$component_type"
 from .$component_name import $component_class
 
 __all__ = [
-    \'$component_class\',
-    \'${caps_component_type}S\',
-    \'build_$component_type\'
+    '$component_class',
+    '${caps_component_type}S',
+    'build_$component_type'
 ]
 """ > "src/$component_type/__init__.py"
 
@@ -38,9 +38,9 @@ def build_$component_type(cfg, default_args)=None):
 """ > "src/$component_type/builder.py"
 
 [ -f "src/$component_type/$component_class" ] || echo \
-"""from .builder import SOLVERS
+"""from .builder import ${caps_component_type}S
 
-@SOLVERS.register_module()
+@${caps_component_type}S.register_module()
 class $component_class:
 
     def __init__(self):

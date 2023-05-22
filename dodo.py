@@ -39,7 +39,7 @@ def task_configs():
     ignore_files = ["builder.py", "__init__.py"]
     ignore_dirs = ["utils", "__pycache__"]
 
-    python_files = _list_files("or_graph", ignore_files, ignore_dirs)
+    python_files = _list_files("src", ignore_files, ignore_dirs)
     return {
         "uptodate": [not python_files],
         "file_dep": list(python_files),
