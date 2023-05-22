@@ -1,11 +1,5 @@
 #!/bin/sh
 
-# Name: Component_Name
-# Create directory, builder.py and __init__.py if not already exists
-# Add module in directory. Let it import builder and register to the Registry.
-# make_configs for new component.
-# Add disclaimer, that you can now use `build_<component_name>` to build that component.
-
 echo "Component Topic (often data, model, ...):"
 read topic
 echo "Component Type: "
@@ -49,6 +43,4 @@ class $component_class:
 
     def __init__(self):
         pass
-""" > "$root_path/$component_name.py"
-
-doit configs
+""" > "$root_path/$component_name.py" && doit configs
