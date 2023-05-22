@@ -15,6 +15,15 @@ The system can be used after initializing it:
 source enter
 ```
 
+## Running the System
+Due to the ``source enter``-script temporarily adding the project directory to the path, the system can easily be used, including auto-completion:
+```shell
+run experiments=...
+# Or with autocompletion
+run e<TAB><TAB>
+```
+This command will list all available experiments, as found in `configs/experiments`.
+
 ## The Component-System
 First, let me introduce you to the underlying workflow-assumption. \
 A system is comprised of components.
@@ -97,3 +106,4 @@ model:
     depth: 5
     ...
 ```
+
