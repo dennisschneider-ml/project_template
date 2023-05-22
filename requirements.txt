@@ -1,0 +1,3 @@
+# Configuration management
+hydra-core == 1.3.2
+doit

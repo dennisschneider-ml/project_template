@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+import hydra
+from omegaconf import DictConfig
+
+
+@hydra.main(version_base=None, config_path="configs", config_name="config")
+def main(config: DictConfig):
+    # Project-specific imports after Hydra-initialization to speed up Hydra-autocompletion.
+    # import ...
+    from src.utils.config import merge_with_subconfig
+    from src.model.gnn import build_gnn
+
+    config : dict = merge_with_subconfig("experiment", config)
+    undefined_parameters = [param_name for value, param_name in get_leaves(config) if value == "???"]
+    assert not undefined_parameters, f"Undefined values {tuple(undefined_parameters)}"
+
+    model_conf = config["model"]
+
+    gnn = build_gnn(model_conf.pop("gnn"))
+
+
+def get_leaves(father):
+    local_list = []
+    for key, son in father.items():
+        if isinstance(father[key], dict):
+            local_list.extend(get_leaves(son))
+        else:
+            local_list.append((son, key))
+    return local_list
+
+
+if __name__ == "__main__":
+    main()
+

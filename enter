@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Enter virtual environment.
+. .venv/bin/activate
+# Initialize Hydra auto-completion.
+eval "$(python ./run -sc install=bash)"
+# Make script runnable by only specifying its name.
+export PATH="$PATH:$pwd"
+
+# Use make-alias for pydoit.
+alias make="doit"

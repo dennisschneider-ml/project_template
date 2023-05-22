@@ -1,0 +1,6 @@
+# Initializes the config with the base-config and an obligatory experiment-specific config.
+# Both are subsequently merged in python.
+
+defaults:
+  - base
+  - experiment: ???
