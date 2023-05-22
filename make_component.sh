@@ -6,16 +6,20 @@
 # make_configs for new component.
 # Add disclaimer, that you can now use `build_<component_name>` to build that component.
 
+echo "Component Topic (often data, model, ...):"
+read topic
 echo "Component Type: "
 read component_type
 echo "Component Name: "
 read component_name
 caps_component_type=${component_type^^}
 component_class=$(echo $component_name | sed -r 's/_([a-z])/\U\1/gi; s/^([a-z])/\U\1/gi; s/$/Model/')
+root_path="src/$topic/$component_type"
+[ -z $topic ] && root_path="src/$component_type"
 
-mkdir -p "src/$component_type"
+mkdir -p "$root_path"
 
-[ -f "src/$component_type/__init__.py" ] || echo \
+[ -f "$root_path/__init__.py" ] || echo \
 """from .builder import ${caps_component_type}S, build_$component_type
 from .$component_name import $component_class
 
@@ -24,9 +28,9 @@ __all__ = [
     '${caps_component_type}S',
     'build_$component_type'
 ]
-""" > "src/$component_type/__init__.py"
+""" > "$root_path/__init__.py"
 
-[ -f "src/$component_type/builder.py" ] || echo \
+[ -f "$root_path/builder.py" ] || echo \
 """from src.utils.config import Registry, build_from_config
 
 
@@ -35,9 +39,9 @@ ${caps_component_type}S = Registry(\"${component_type}s\")
 
 def build_$component_type(cfg, default_args)=None):
     return build_from_config(cfg, ${caps_component_type}S, default_args=default_args)
-""" > "src/$component_type/builder.py"
+""" > "$root_path/builder.py"
 
-[ -f "src/$component_type/$component_class" ] || echo \
+[ -f "$root_path/$component_name.py" ] || echo \
 """from .builder import ${caps_component_type}S
 
 @${caps_component_type}S.register_module()
@@ -45,4 +49,4 @@ class $component_class:
 
     def __init__(self):
         pass
-"""
+""" > "$root_path/$component_name.py"
