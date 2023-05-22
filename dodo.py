@@ -40,11 +40,12 @@ def task_configs():
     ignore_dirs = ["utils", "__pycache__"]
 
     python_files = _list_files("src", ignore_files, ignore_dirs)
+    print(python_files)
     return {
-        "uptodate": [not python_files],
+        "uptodate": [len(python_files) == 0],
         "file_dep": list(python_files),
         "actions": [
-            'python make_configs.py -f {changed}'
+            'python make_configs.py -f {dependencies}'
         ],
         "verbosity": 2,
     }

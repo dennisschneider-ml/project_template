@@ -37,7 +37,7 @@ __all__ = [
 ${caps_component_type}S = Registry(\"${component_type}s\")
 
 
-def build_$component_type(cfg, default_args)=None):
+def build_$component_type(cfg, default_args=None):
     return build_from_config(cfg, ${caps_component_type}S, default_args=default_args)
 """ > "$root_path/builder.py"
 
@@ -50,3 +50,5 @@ class $component_class:
     def __init__(self):
         pass
 """ > "$root_path/$component_name.py"
+
+doit configs
