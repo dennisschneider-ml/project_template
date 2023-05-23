@@ -32,7 +32,7 @@ However, especially in a research-context, multiple components need to be evalua
 Thus, a system is assumed in which each component has its own implementation and configuration and an execution of the system is bundled within experiments. \
 An experiment is comprised of a selection of components it uses and an optional overwriting of selected parameters.
 In effect, an entire research system can be instantiated from configuration files, since components within a common type act similarly. \
-The idea behind this template is, to create such components and component-types using the `make_component.sh`-script and automatically creating corresponding configuration files.
+The idea behind this template is, to create such components and component-types using the `add_component`-script and automatically creating corresponding configuration files.
 
 Furthermore, a research project is in need of a reproducible dataset-creation system.
 Thus, this template provides the command `make <dataset_name>` which automatically downloads and preprocesses all datasets given the implemented scripts.
@@ -40,7 +40,7 @@ Notable here, is the already implemented multi-core functionality of the provide
 
 
 ## Automated Configuration-Management
-Running `sh make_component.sh` opens a small terminal application to lead you through the creation of the component-based system:
+Running `add_component` opens a small terminal application to lead you through the creation of the component-based system:
 ```shell
 Component Topic (often data, model, ...):
 > model
