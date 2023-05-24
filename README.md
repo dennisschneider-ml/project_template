@@ -1,7 +1,8 @@
 # Research Template
 
-This template enables an easy installation, configuration management system and dataset reproduction system. \
-It revolves around modularizing the software system into its components, as described in the following.
+This template repository enables an easy configuration management system and dataset reproduction system for research projects. \
+It revolves around modularizing the software system into its components, making the reproduction, management and logging of experiments easier. \
+This project was developed after realizing a few pitfalls of past research-projects and in an attempt to address a reproduction and understanding of measurements multiple months after executing them.
 
 ## Installation
 Run the following command to install the environment.
