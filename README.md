@@ -15,6 +15,44 @@ The system can be used after initializing it:
 source enter
 ```
 
+## Getting Started
+
+<details>
+    <summary>
+        1. Creating Components
+    </summary>
+    
+</details>
+
+<details>
+    <summary>
+        2. A look into the generated Config-files
+    </summary>
+    
+</details>
+
+<details>
+    <summary>
+        3. Bundling Components into single Experiments
+    </summary>
+    
+</details>
+
+<details>
+    <summary>
+        4. Bringing everything together: The complete System
+    </summary>
+    
+</details>
+
+<details>
+    <summary>
+        5. Running and Logging of results
+    </summary>
+    
+</details>
+
+
 ## Running the System
 Due to the ``source enter``-script temporarily adding the project directory to the path, the system can easily be used, including auto-completion:
 ```shell
