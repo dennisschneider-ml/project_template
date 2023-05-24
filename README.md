@@ -1,7 +1,7 @@
 # Research Template
 
 This template enables an easy installation, configuration management system and dataset reproduction system. \
-It revolves around modularizing the system into its components, as described in the following.
+It revolves around modularizing the software system into its components, as described in the following.
 
 ## Installation
 Run the following command to install the environment.
@@ -22,20 +22,93 @@ source enter
         1. Creating Components
     </summary>
     
+After entering the environment with ``source enter``, we can start to build the architecture of our system component by component.
+Assume, that components are structured in a similar fashion to the following:
+````
+├── model
+│   ├── attributors
+│   │   ├── nlp
+│   │   ├── vision
+│   ├── gans
+│   │   ├── nlp
+│   │   ├── vision
+├── dataset
+│   ├── imagenet
+````
+This architecture assumes - as is often the case in a research-context - that for a certain component within a software-architecture, we want to compare multiple different implementation against eachother. \
+The directory-depths will in the following be known as ``topic`` (e.g. model, dataset), optionally ``type`` (e.g. attributors, gans) and ``name`` (e.g. base, nlp, imagenet). \
+For initializing this structure, the command-line script ``add_component`` can be used to easily create multiple components.
+Executing ``tree`` on the repository shows the created copmonents, including their configuration-files mirroring the source file-structure:
+````
+├── configs
+│   ├── base.yaml
+│   ├── config.yaml
+│   ├── model
+│   │   ├── attributors
+│   │   │   ├── base.yaml
+│   │   │   ├── nlp.yaml
+│   │   │   ├── vision.yaml
+├── src
+│   ├── __init__.py
+│   ├── model
+│   │   ├── attributors
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── builder.py
+│   │   │   ├── nlp.py
+│   │   │   ├── vision.py
+````
+It immediately becomes apparent, that each implementation has a corresponding configuration file.
+We will use this configuration file to instantiate an entire object out of it, by specifying all arguments of an object's constructor in the configuration file. \
+Since keeping track of changing constructors and a configuration file can be cumbersome, simply executing ``make`` or ``make configs`` is sufficient to reload all configuration files of source files we have changed.
+Thus, we will generate the following for a certain implementation source file:
+````python
+# model/attributors/base.py
+
+class BaseModel(Module):
+
+    def __init__(self, p_dropout, hidden_dim, use_softmax):
+        pass
+````
+````yaml
+type: BaseModel
+p_dropout: ???
+hidden_dim: ???
+use_softmax: ???
+````
+We can now fill in the standard configuration for each component.
+This is simply the out-of-the-box configuration which can later be overwritten in the respective Experiments.
 </details>
 
 <details>
     <summary>
         2. A look into the generated Config-files
     </summary>
-    
+
+Each config file consists of a ``type``, which declares the class to instantiate and a set of parameters to fill in the constructor.
+Note here, that the ``**kwargs`` argument will never appear here while any manually added argument will automatically be passed to the constructor in the expected ``**kwargs`` behavior. \
 </details>
 
 <details>
     <summary>
-        3. Bundling Components into single Experiments
+        3. Bundling Components into stand-alone Experiments
     </summary>
     
+Since in a research-context, different experiments consist of different architecture-combinations, the template offers an easy interface to create new, independent experiments, which can easily be logged, evaluated and stashed, if need be. \
+The config-directory ``configs/experiment`` will be scanned for any ``yaml``-files and recommends them in the commandline upon entering ``run e<TAB><TAB>`` or ``run experiment=<TAB>``.
+An experiment configuration is defined in the following way:
+````yaml
+# Path to all components
+defaults:
+    - model/attributors: nlp.yaml
+    - model/gans: nlp/yaml
+
+# Explicit overwriting of certain parameters
+model:
+    attributors:
+        p_dropout: 0.3
+````
+To define a default system-configuration, the same is recommended to be done in the ``configs/base.yaml``-file.
 </details>
 
 <details>
@@ -43,110 +116,72 @@ source enter
         4. Bringing everything together: The complete System
     </summary>
     
+After having created the entire architecture, the project can be combined in the ``run``-script.
+Note, that imports should be conducted within the ``main``-function due to prevent slowing down the auto-completion of Hydra. \
+The single components now can conveniently be parsed from the config by using the respective ``builder.py``-classes.
+````python
+from src.model.attributors import build_attributor
+from src.model.gans import build_gan
+
+...
+
+model_conf = config["model"]
+attributor = build_attributor(model_conf.pop("attributor"))
+gan = build_gan(model_conf.pop("gan"))
+
+# Now use these components in a reasonable way.
+# In an ML context, this would probably mean, concatenating them in a Sequential-Model and
+# Run this model within a Solver-Object, which itself is instantiated from a Config.
+# This Solver would have a Learning Rate, a Loss Function, an Optimizer Name, ...
+````
 </details>
 
 <details>
     <summary>
         5. Running and Logging of results
     </summary>
-    
-</details>
 
-
-## Running the System
-Due to the ``source enter``-script temporarily adding the project directory to the path, the system can easily be used, including auto-completion:
-```shell
-run experiment=...
-# Or with autocompletion
+As already introduced, the entire pipeline can be run using the following command:
+````shell
 run e<TAB><TAB>
-```
-This command will list all available experiments, as found in `configs/experiments`.
-
-## The Component-System
-<details>
-    <summary>
-        Introduction
-    </summary>
-First, let me introduce you to the underlying workflow-assumption. \
-A system is comprised of components.
-Each component has a certain implementation and attributes.
-However, especially in a research-context, multiple components need to be evaluated against eachother.
-Thus, a system is assumed in which each component has its own implementation and configuration and an execution of the system is bundled within experiments. \
-An experiment is comprised of a selection of components it uses and an optional overwriting of selected parameters.
-In effect, an entire research system can be instantiated from configuration files, since components within a common type act similarly. \
-The idea behind this template is, to create such components and component-types using the `add_component`-script and automatically creating corresponding configuration files.
+# or
+run experiment=<TAB>
+````
+This will list all available experiments which can conveniently be selected and run.
+In the end, the results, logs and configurations are saved to ``outputs/<Date>/<Time>``. \
+The log-level by default is ``DEBUG`` and uses the standard ``logging`` module.
+The used configuration can be found in ``<output_dir>/.hydra/config.yaml``.
+</details>
 
 Furthermore, a research project is in need of a reproducible dataset-creation system.
 Thus, this template provides the command `make <dataset_name>` which automatically downloads and preprocesses all datasets given the implemented scripts.
 Notable here, is the already implemented multi-core functionality of the provided preprocessing script, automatically using all physical cores present in the machine.
 </details>
 
+<details>
+    <summary>
+        6. Reproducing your results
+    </summary>
 
-## Automated Configuration-Management
-Running `add_component` opens a small terminal application to lead you through the creation of the component-based system:
-```shell
-Component Topic (often data, model, ...):
-> model
-Component Type:
-> gnn
-Component Name:
-> base
-```
-This would create the directory `src/model/gnn/base/` and would provide `__init__.py`, `builder.py` and `base.py` files which are needed for the configuration environment.
-The model is called `BaseModel` in `base.py`, which is where you implement the component itself.
-The builder can be used in the following way to instantiate a model entirely from the generated config:
-```python
-from src.model.gnn import build_gnn
-
-component = build_gnn(gnn_config, default_args={...})
-```
-While a corresponding yaml configuration-file is created in `configs/model/gnn/base.yaml`.
-It declares each variable named in the constructor of the component-model.
-Reload all change-affected configs by running `make configs`.
-
-
-## Automated Dataset-Management
-A Dataset can be added by creating a directory in `data/`.
-Running `make list` now shows a new task showing this new directory.
-Running `make <directory_name>` creates an initial directory-structure for this dataset. \
-Next, the script `get_original_data.sh` should retrieve the dataset and store it in `data/<dataset_name>/original`.
-Each file which exists in `original` but not in `preprocessed` is piped through `preprocess.py`.
-Thus, this file should be implemented next to preprocess the data accordingly. \
-This dataset-processing is done only for unprocessed data or if the `get_original_data.sh`-script is changed. Thus, large datasets can be processed over-night and can easily be made reproducable in a git-repository without storing the datasets themselves.
-
-
-## The Configuration architecture
-In general, the configurations are built in the following way:
-```shell
-- configs/
------ base.yaml
------ config.yaml
------ experiment
---------- experiment01.yaml
---------- ...
-```
-The `base.yaml` file should define the base components and the general setup of the model.
-```yaml
-defaults:
-  - model/solver/base
-  - model/gnn/base
-  - data/dataset1/concept
-  - ...
-```
-The config.yaml should not be changed and simply makes the experiment-argument obligatory.
-```yaml
-defaults:
-  - base
-  - experiment: ???
-```
-Each experiment should use the components listed in `configs/model/...` and may override experiment-specific arguments.
-```yaml
-defaults:
-  - model/gnn: other_model
-
-model:
-  gnn:
-    depth: 5
-    ...
-```
+After having used this Template, the input configurations, the logging at runtime and the end-results are saved in corresponding directories.
+We successfully have accomplished full reproducibility!
+But ... have we?
+The answer is no! \
+We have not yet talked about the processing and retrieving of our datasets.
+This is another feature of this template and is easily explained.
+After having decided on datasets to use for your research project, add corresponding directories to the ``data``-directory.
+Running ``make`` or ``make <directory_name>`` will automatically create a predefined directory structure for each dataset:
+````
+├── data
+│   ├── dataset1
+│   │   ├── get_original_data.sh
+│   │   ├── original
+│   │   ├── preprocess.py
+│   │   ├── preprocessed
+````
+As soon as you change the ``get_original_data.sh``-file, running ``make`` will execute the script, which should populate the ``original`` directory with the raw data-files.
+Afterwards, for each file in ``original`` which does not have a counterpart in ``preprocessed``, the corresponding files will be piped through the ``preprocess.py``-script and saved to ``preprocessed``. \
+Another execution of ``make`` on an already processed dataset will not run anything.
+Notable here is, that the ``preprocess.py``-script per default uses all available hardware-cores to process the dataset in parallel.
+</details>
 
