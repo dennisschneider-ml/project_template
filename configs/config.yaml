@@ -2,5 +2,8 @@
 # Both are subsequently merged in python.
 
 defaults:
+  - _self_
   - base
   - experiment: ???
+
+log: DEBUG
