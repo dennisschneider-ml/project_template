@@ -9,15 +9,16 @@ def main(config: DictConfig):
     # Project-specific imports after Hydra-initialization to speed up Hydra-autocompletion.
     # import ...
     from src.utils.config import merge_with_subconfig
-    from src.model.gnn import build_gnn
 
     config : dict = merge_with_subconfig("experiment", config)
     undefined_parameters = [param_name for value, param_name in get_leaves(config) if value == "???"]
     assert not undefined_parameters, f"Undefined values {tuple(undefined_parameters)}"
 
-    model_conf = config["model"]
+    # TODO: Get component-specific config.
+    # model_conf = config["model"]
+    # TODO: Instantiate model from config.
+    # build_model(model_conf)
 
-    gnn = build_gnn(model_conf.pop("gnn"))
 
 
 def get_leaves(father):
