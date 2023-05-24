@@ -77,6 +77,7 @@ def _process_dataset(dataset_dir):
     yield {
         "doc": f"Fetch original data for {dataset_dir.name}.",
         "basename": dataset_dir.name,
+        "name": "Fetch",
         "file_dep": [dataset_dir / "get_original_data.sh"],
         "actions": [
             'sh {dependencies}'
@@ -96,6 +97,7 @@ def _preprocess_file(original_file, prep_file):
     yield {
         "doc": "Preprocess the dataset %s." % dataset_path.name,
         "basename": dataset_path.name,
+        "name": "Preprocess",
         "file_dep": [original_file],
         "targets": [prep_file],
         "actions": [
