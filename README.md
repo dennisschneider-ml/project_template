@@ -49,7 +49,7 @@ Executing ``tree`` on the repository shows the created copmonents, including the
 │   │   │   ├── base.yaml
 │   │   │   ├── nlp.yaml
 │   │   │   ├── vision.yaml
-├── src
+├── srcd
 │   ├── __init__.py
 │   ├── model
 │   │   ├── attributors
@@ -72,6 +72,8 @@ class BaseModel(Module):
         pass
 ````
 ````yaml
+# model/attributors.base.yaml
+
 type: BaseModel
 p_dropout: ???
 hidden_dim: ???
