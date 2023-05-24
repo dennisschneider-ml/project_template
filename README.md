@@ -1,7 +1,7 @@
 # Research Template
 
 This template enables an easy installation, configuration management system and dataset reproduction system. \
-The system revolves around modularizing the system into its components, as described in the following.
+It revolves around modularizing the system into its components, as described in the following.
 
 ## Installation
 Run the following command to install the environment.
@@ -18,13 +18,17 @@ source enter
 ## Running the System
 Due to the ``source enter``-script temporarily adding the project directory to the path, the system can easily be used, including auto-completion:
 ```shell
-run experiments=...
+run experiment=...
 # Or with autocompletion
 run e<TAB><TAB>
 ```
 This command will list all available experiments, as found in `configs/experiments`.
 
 ## The Component-System
+<details>
+    <summary>
+        Introduction
+    </summary>
 First, let me introduce you to the underlying workflow-assumption. \
 A system is comprised of components.
 Each component has a certain implementation and attributes.
@@ -37,6 +41,7 @@ The idea behind this template is, to create such components and component-types 
 Furthermore, a research project is in need of a reproducible dataset-creation system.
 Thus, this template provides the command `make <dataset_name>` which automatically downloads and preprocesses all datasets given the implemented scripts.
 Notable here, is the already implemented multi-core functionality of the provided preprocessing script, automatically using all physical cores present in the machine.
+</details>
 
 
 ## Automated Configuration-Management
