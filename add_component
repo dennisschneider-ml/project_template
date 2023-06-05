@@ -2,14 +2,14 @@
 
 echo "Component Topic (often data, model, ...):"
 read topic
-echo "Component Type: "
+echo "[Optionally] Component Type (type for which multiple implementations may exist): "
 read component_type
-echo "Component Name: "
+echo "Component Name (Actual name for component variant): "
 read component_name
 caps_component_type=${component_type^^}
 component_class=$(echo $component_name | sed -r 's/_([a-z])/\U\1/gi; s/^([a-z])/\U\1/gi; s/$/Model/')
 root_path="src/$topic/$component_type"
-[ -z $topic ] && root_path="src/$component_type"
+[ -z $component_type ] && root_path="src/$topic"
 
 mkdir -p "$root_path"
 
