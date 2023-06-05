@@ -2,7 +2,7 @@
 
 This template repository enables an easy configuration management system and dataset reproduction system for research projects. \
 It revolves around modularizing the software system into its components, making the reproduction, management and logging of experiments easier. \
-This project was developed after realizing a few pitfalls of past research-projects and in an attempt to address a reproduction and understanding of measurements multiple months after executing them.
+This project was developed after realizing a few pitfalls of past research-projects and in an attempt to address a loss of understanding of measurements multiple months after executing them.
 
 ## Installation
 Run the following command to install the environment.
@@ -36,8 +36,8 @@ Assume, that components are structured in a similar fashion to the following:
 ├── dataset
 │   ├── imagenet
 ````
-This architecture assumes - as is often the case in a research-context - that for a certain component within a software-architecture, we want to compare multiple different implementation against eachother. \
-The directory-depths will in the following be known as ``topic`` (e.g. model, dataset), optionally ``type`` (e.g. attributors, gans) and ``name`` (e.g. base, nlp, imagenet). \
+This architecture assumes - as is often the case in a research-context - that for a certain component within a software-architecture, we want to compare multiple different implementations against eachother. \
+The directory-depths will in the following be known as ``topic`` (e.g. model, dataset), optionally ``type`` (e.g. attributors, gans) and ``name`` (the name of the actual component implementation). \
 For initializing this structure, the command-line script ``add_component`` can be used to easily create multiple components.
 Executing ``tree`` on the repository shows the created copmonents, including their configuration-files mirroring the source file-structure:
 ````
@@ -49,7 +49,7 @@ Executing ``tree`` on the repository shows the created copmonents, including the
 │   │   │   ├── base.yaml
 │   │   │   ├── nlp.yaml
 │   │   │   ├── vision.yaml
-├── srcd
+├── src
 │   ├── __init__.py
 │   ├── model
 │   │   ├── attributors
@@ -59,10 +59,10 @@ Executing ``tree`` on the repository shows the created copmonents, including the
 │   │   │   ├── nlp.py
 │   │   │   ├── vision.py
 ````
-It immediately becomes apparent, that each implementation has a corresponding configuration file.
+It immediately becomes apparent, that each implementation has a corresponding configuration file (``configs/model/attributors/base.yaml`` for ``src/model/attributors/base.py``).
 We will use this configuration file to instantiate an entire object out of it, by specifying all arguments of an object's constructor in the configuration file. \
 Since keeping track of changing constructors and a configuration file can be cumbersome, simply executing ``make`` or ``make configs`` is sufficient to reload all configuration files of source files we have changed.
-Thus, we will generate the following for a certain implementation source file:
+Thus, after specifying a constructor in the generated py-files, the configuration file is generated:
 ````python
 # model/attributors/base.py
 
@@ -98,19 +98,20 @@ Note here, that the ``**kwargs`` argument will never appear here while any manua
     </summary>
     
 Since in a research-context, different experiments consist of different architecture-combinations, the template offers an easy interface to create new, independent experiments, which can easily be logged, evaluated and stashed, if need be. \
-The config-directory ``configs/experiment`` will be scanned for any ``yaml``-files and recommends them in the commandline upon entering ``run e<TAB><TAB>`` or ``run experiment=<TAB>``.
+The config-directory ``configs/experiment`` will be scanned for any ``yaml``-files and found files will be recommended in the commandline upon entering ``run e<TAB><TAB>`` or ``run experiment=<TAB>``.
 An experiment configuration is defined in the following way:
 ````yaml
-# Path to all components
+# Path to all components used in this experiment.
 defaults:
     - model/attributors: nlp.yaml
-    - model/gans: nlp/yaml
+    - model/gans: nlp.yaml
 
-# Explicit overwriting of certain parameters
+# Explicit overwriting of certain parameters.
 model:
     attributors:
         p_dropout: 0.3
 ````
+
 To define a default system-configuration, the same is recommended to be done in the ``configs/base.yaml``-file.
 </details>
 
@@ -156,23 +157,18 @@ The log-level by default is ``DEBUG`` and uses the standard ``logging`` module.
 The used configuration can be found in ``<output_dir>/.hydra/config.yaml``.
 </details>
 
-Furthermore, a research project is in need of a reproducible dataset-creation system.
-Thus, this template provides the command `make <dataset_name>` which automatically downloads and preprocesses all datasets given the implemented scripts.
-Notable here, is the already implemented multi-core functionality of the provided preprocessing script, automatically using all physical cores present in the machine.
-</details>
-
 <details>
     <summary>
         6. Reproducing your results
     </summary>
 
-After having used this Template, the input configurations, the logging at runtime and the end-results are saved in corresponding directories.
+After having used this template, the input configurations, the logging at runtime and the end-results are saved in corresponding directories.
 We successfully have accomplished full reproducibility!
 But ... have we?
 The answer is no! \
 We have not yet talked about the processing and retrieving of our datasets.
 This is another feature of this template and is easily explained.
-After having decided on datasets to use for your research project, add corresponding directories to the ``data``-directory.
+After having decided on datasets to use for our research project, add corresponding directories to the ``data``-directory.
 Running ``make`` or ``make <directory_name>`` will automatically create a predefined directory structure for each dataset:
 ````
 ├── data
