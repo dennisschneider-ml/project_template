@@ -6,6 +6,7 @@ import importlib
 import logging
 import yaml
 from argparse import ArgumentParser
+import ast
 
 
 def get_config_path(input_path):
@@ -21,14 +22,30 @@ def get_config_path(input_path):
 
 
 def get_constructor_parameters(src_path):
-    src_path = src_path.split(".")[0].replace("/", ".")
-    mod = importlib.import_module(src_path)
-    model_name, model_cls = next(filter(lambda member: "Model" in member[0], inspect.getmembers(mod, inspect.isclass)))
-    parameters = inspect.signature(model_cls).parameters
+    with open(src_path, "r") as file:
+        source = file.read()
+    tree = ast.parse(source)
+    parameters, model_name = None, None
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef):
+            decorators = node.decorator_list
+            matching_decorator_found = next((ast.unparse(decorator).endswith(".register_module()")
+                for decorator in decorators), None)
+            if matching_decorator_found:
+                init_args = next(func.args.args for func in node.body if func.name == "__init__")
+                model_name = node.name
+                parameters = [a.arg for a in init_args]
+                break
+    if parameters is None:
+        print(f"ERROR: No decorated class found in '{src_path}'.")
+        return
+
     config_parameters = {"type": model_name} | {param: "???" for param in parameters}
+    del config_parameters["self"]
     # Ignore "kwargs"-parameter.
     if "kwargs" in config_parameters:
         del config_parameters["kwargs"]
+    print(config_parameters)
     return config_parameters
    
 
