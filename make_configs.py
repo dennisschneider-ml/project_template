@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import inspect
-import importlib
 import logging
 import yaml
 from argparse import ArgumentParser
@@ -45,7 +43,6 @@ def get_constructor_parameters(src_path):
     # Ignore "kwargs"-parameter.
     if "kwargs" in config_parameters:
         del config_parameters["kwargs"]
-    print(config_parameters)
     return config_parameters
    
 
