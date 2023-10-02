@@ -1,11 +1,13 @@
+import logging
+
 from omegaconf import DictConfig, OmegaConf
 
 
 def merge_with_subconfig(parameter: str, config: DictConfig) -> dict:
-    dict_config: dict = OmegaConf.to_container(config, resolve=True)    #type: ignore
-    subconfig = dict_config.pop(parameter)                            
+    dict_config: dict = OmegaConf.to_container(config, resolve=True)  # type: ignore
+    subconfig = dict_config.pop(parameter)
     base_config = dict_config
-    return _merge_dicts(base_config, subconfig)                        
+    return _merge_dicts(base_config, subconfig)
 
 
 def _merge_dicts(base_dict: dict, override_dict: dict) -> dict:
@@ -13,30 +15,39 @@ def _merge_dicts(base_dict: dict, override_dict: dict) -> dict:
         if isinstance(v, dict):
             base_dict[k] = _merge_dicts(base_dict[k], v)
         else:
+            if k not in base_dict:
+                logging.warning(f"Key '{k}' not found in base configuration.")
             base_dict[k] = v
     return base_dict
 
 
 def build_from_config(config: DictConfig, registry, default_args=None):
-    if 'type' not in config:
-        if default_args is None or 'type' not in default_args:
+    if "type" not in config:
+        if default_args is None or "type" not in default_args:
             raise KeyError('config must contain "type" attribute')
-    args = config
+    args = config.copy()
     if default_args is not None:
         for name, value in default_args.items():
-            args.setdefault(name, value)
+            args[name] = value
     obj_type = args.pop("type")
 
     obj_class = registry.get(obj_type)
     if obj_class is None:
-        raise KeyError(f'{obj_type} is not in the {registry.name} registry')
+        raise KeyError(f"{obj_type} is not in the {registry.name} registry")
     return obj_class(**args)
 
-def test():
-    print("lol")
+
+def get_leaves(father):
+    local_list = []
+    for key, son in father.items():
+        if isinstance(son, dict):
+            local_list.extend(get_leaves(son))
+        else:
+            local_list.append((son, key))
+    return local_list
+
 
 class Registry:
-
     def __init__(self, name, build_func=None) -> None:
         self._name = name
         self._module_dict = dict()
@@ -50,9 +61,10 @@ class Registry:
         return len(self._module_dict)
 
     def __repr__(self):
-        format_str = self.__class__.__name__ + \
-                     f'(name={self._name}, ' \
-                     f'items={self._module_dict})'
+        format_str = (
+            self.__class__.__name__ + f"(name={self._name}, "
+            f"items={self._module_dict})"
+        )
         return format_str
 
     @property
@@ -69,9 +81,9 @@ class Registry:
 
     @staticmethod
     def split_scope_key(key):
-        split_index = key.find('.')
+        split_index = key.find(".")
         if split_index != -1:
-            return key[:split_index], key[split_index + 1:]
+            return key[:split_index], key[split_index + 1 :]
         else:
             return None, key
 
@@ -80,8 +92,7 @@ class Registry:
 
     def register_module(self, name=None, force=False, module=None):
         def _register(cls):
-            self._register_module(
-                module_class=cls, module_name=name, force=force)
+            self._register_module(module_class=cls, module_name=name, force=force)
             return cls
 
         return _register
@@ -93,7 +104,5 @@ class Registry:
             module_name = [module_name]
         for name in module_name:
             if not force and name in self._module_dict:
-                raise KeyError(f'{name} is already registered '
-                               f'in {self.name}')
+                raise KeyError(f"{name} is already registered " f"in {self.name}")
             self._module_dict[name] = module_class
-
