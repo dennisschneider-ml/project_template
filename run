@@ -25,16 +25,6 @@ def main(base_config: DictConfig):
     # build_model(model_conf)
 
 
-def get_leaves(father):
-    local_list = []
-    for key, son in father.items():
-        if isinstance(son, dict):
-            local_list.extend(get_leaves(son))
-        else:
-            local_list.append((son, key))
-    return local_list
-
-
 if __name__ == "__main__":
     main()
 
