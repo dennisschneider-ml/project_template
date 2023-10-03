@@ -9,6 +9,7 @@ def main(base_config: DictConfig):
     # Project-specific imports after Hydra-initialization to speed up Hydra-autocompletion.
     # import ...
     import logging
+
     from src.utils.config import merge_with_subconfig
 
     config : dict = merge_with_subconfig("experiment", base_config)

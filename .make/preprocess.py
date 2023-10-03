@@ -1,9 +1,11 @@
 #!/bin/python
 
+import logging
 from argparse import ArgumentParser
 from multiprocessing import Pool
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 import psutil
 
 
@@ -18,13 +20,13 @@ def process(data: pd.DataFrame) -> pd.DataFrame:
 if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument('infile')
-    parser.add_argument('outfile')
+    parser.add_argument("infile")
+    parser.add_argument("outfile")
     args = parser.parse_args()
 
     all_items = pd.read_csv(args.infile)
     original_size = len(all_items)
-    print(f"Original dataset-length: {original_size}")
+    logging.info(f"Original dataset-length: {original_size}")
 
     # Get amount of physical CPU-cores for maximum utility usage.
     num_cpus = psutil.cpu_count(logical=False)
@@ -38,6 +40,9 @@ if __name__ == "__main__":
     dataset = pd.concat(resulting_dfs, ignore_index=True)
 
     preprocessed_size = len(dataset)
-    print(f'The preprocessed dataset consists of {preprocessed_size} samples. This equates to {100*preprocessed_size/original_size}% of the original dataset.', flush=True)
+    logging.info(
+        f"The preprocessed dataset consists of {preprocessed_size} samples. This equates to {100*preprocessed_size/original_size}% of the original dataset.",
+        flush=True,
+    )
 
     dataset.to_csv(args.outfile)
