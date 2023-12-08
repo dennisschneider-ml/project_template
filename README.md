@@ -9,12 +9,16 @@ Run the following command to install the environment.
 ```shell
 .make/install
 ```
+A usage of pyenv (Management of multiple Python-versions), direnv (Set environment variables locally inside of a directory), dotenv is recommended.
 
 ## Setup for Usage
 The system can be used after initializing it:
 ```shell
 source enter
 ```
+Local environment variables are initialized in `.envrc`and `.envrc.public`.
+The difference between them is, that `.envrc.public` is included in version-control and should NOT contain passwords or API-keys.
+These belong into `.envrc`.
 
 ## Getting Started
 

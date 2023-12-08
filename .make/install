@@ -1,7 +1,21 @@
-#!/bin/sh
+#!/bin/env bash
 
 # Change directory to project-directory.
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+# Setup python version before creating virtualenv.
+source .envrc.public
+
+# Setup virtualenv and install requirements
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
+
+# Create initial .envrc
+if [ ! -f .envrc ]; then
+    echo """PATH_add .
+PATH_add .venv/bin
+PATH_add .make/bin
+
+source_env .envrc.public
+    """ > .envrc
+fi

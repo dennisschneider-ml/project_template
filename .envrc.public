@@ -1,0 +1,6 @@
+#!/bin/sh
+# Configuration-Relevant Environment Variables.
+
+export PYENV_VERSION=3.10.13
+export VIRTUAL_ENV=.venv
+export LOGURU_LEVEL=INFO

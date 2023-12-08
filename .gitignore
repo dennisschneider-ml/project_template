@@ -5,3 +5,6 @@ outputs
 data/*/original/*
 data/*/preprocessed/*
 stage
+# Hide security-relevant environment variables in .envrc
+# Move all configuration-relevant environment variables to .env
+.envrc 
