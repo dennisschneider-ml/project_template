@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import ast
-import logging
+from loguru import logger
 import os
 from argparse import ArgumentParser
 
@@ -43,7 +43,7 @@ def get_constructor_parameters(src_path):
                 parameters = [a.arg for a in init_args]
                 break
     if parameters is None:
-        print(f"ERROR: No decorated class found in '{src_path}'.")
+        logger.warning(f"No decorated class found in '{src_path}'.")
         return
 
     config_parameters = {"type": model_name} | {param: "???" for param in parameters}
@@ -58,8 +58,6 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-f", dest="files", nargs="+")
     args = parser.parse_args()
-
-    logging.basicConfig(level=logging.INFO)
 
     for src in args.files:
         config_path = get_config_path(src)
@@ -81,4 +79,4 @@ if __name__ == "__main__":
             curr_config.update(changes)
             with open(config_path, "w+") as file:
                 yaml.dump(curr_config, file, sort_keys=False)
-            logging.info(f"Updated {tuple(new_keys)} in {config_path}.")
+            logger.info(f"Updated {tuple(new_keys)} in {config_path}.")

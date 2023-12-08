@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from omegaconf import DictConfig, OmegaConf
 
@@ -16,7 +16,7 @@ def _merge_dicts(base_dict: dict, override_dict: dict) -> dict:
             base_dict[k] = _merge_dicts(base_dict[k], v)
         else:
             if k not in base_dict:
-                logging.warning(f"Key '{k}' not found in base configuration.")
+                logger.warning(f"Key '{k}' not found in base configuration.")
             base_dict[k] = v
     return base_dict
 

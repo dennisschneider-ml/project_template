@@ -5,5 +5,3 @@ defaults:
   - _self_
   - base
   - experiment: ???
-
-log: DEBUG

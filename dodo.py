@@ -1,4 +1,5 @@
 from pathlib import Path
+from loguru import logger
 
 from doit.tools import Interactive
 
@@ -12,7 +13,7 @@ def task_datasets():
     root_dir = Path("data")
     if not root_dir.exists():
         root_dir.mkdir()
-        print("Initially created datasets directory.")
+        logger.info("Initially created datasets directory.")
     datasets = filter(lambda d: d.is_dir(), root_dir.iterdir())
     for dataset_dir in datasets:
         yield {
@@ -45,12 +46,15 @@ def task_datasets():
             return
         for orig_file in Path.iterdir(dataset_dir / "original"):
             yield {
-                "name": f"exec_preprocess_{dataset_dir}_{orig_file}",
+                "name": f"exec_preprocess_{dataset_dir}_{orig_file.stem}",
                 "uptodate": [True],
-                "file_dep": [dataset_dir / "original" / orig_file / "graph_data.csv"],
-                "targets": [dataset_dir / "preprocessed" / (orig_file + ".pt")],
+                # TODO This leads to the original file.
+                "file_dep": [dataset_dir / "original" / orig_file.name],
+                # TODO This is the destination where the preprocessed file
+                # will be stored.
+                "targets": [dataset_dir / "preprocessed" / (orig_file.stem + ".pt")],
                 "actions": [
-                    dataset_dir + "/preprocess.py {dependencies} {targets}",
+                    str(dataset_dir) + "/preprocess.py {dependencies} {targets}",
                 ],
                 "verbosity": 2,
             }
@@ -58,8 +62,8 @@ def task_datasets():
 
 def task_configs():
     """Sync configs with class-constructors."""
-    ignore_files = ["builder.py", "__init__.py"]
-    ignore_dirs = ["utils", "__pycache__"]
+    ignore_files = ["builder.py", "__init__.py", "utils/config.py"]
+    ignore_dirs = ["__pycache__"]
 
     python_files = _list_files(Path("src"), ignore_files, ignore_dirs)
     return {
