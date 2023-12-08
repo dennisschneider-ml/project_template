@@ -8,17 +8,18 @@ from omegaconf import DictConfig
 def main(base_config: DictConfig):
     # Project-specific imports after Hydra-initialization to speed up Hydra-autocompletion.
     # import ...
-    import logging
+    import sys
+    from loguru import logger
 
-    from src.utils.config import merge_with_subconfig
+    from src.utils.config import merge_with_subconfig, get_leaves
 
     config : dict = merge_with_subconfig("experiment", base_config)
     undefined_parameters = [param_name for value, param_name in get_leaves(config) if value == "???"]
     assert not undefined_parameters, f"Undefined values {tuple(undefined_parameters)}"
 
     # Setting up Logging with LogLevel as specified by 'log'-argument.
-    log = logging.getLogger(__name__)
-    log.setLevel(config["log"])
+    logger.remove()
+    logger.add(sys.stderr, level=config["loglevel"])
 
     # TODO: Get component-specific config.
     # model_conf = config["model"]
